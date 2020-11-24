@@ -22,6 +22,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "Board_LED.h"
+#include "app_main.h"
+#include "processing.h"
 
 /* USER CODE END Includes */
 
@@ -104,12 +107,20 @@ int main(void)
   MX_UART5_Init();
   /* USER CODE BEGIN 2 */
 
+  // initialize LEDs
+  LED_Initialize();
+
+  // initialize app
+  app_init();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    // perform data processing
+    processing();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -390,6 +401,11 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+
+  // turn on red LED
+  LED_On(1u);
+  // loop forever
+  while(1);
 
   /* USER CODE END Error_Handler_Debug */
 }

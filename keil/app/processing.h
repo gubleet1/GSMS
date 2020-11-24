@@ -1,0 +1,25 @@
+#ifndef GSMS_PROCESSING_H
+#define GSMS_PROCESSING_H
+
+#include <stdint.h>
+
+// bno055 sample
+extern double accel[];
+extern double mag[];
+extern double gyro[];
+extern double quat[];
+
+// neo-m9n sample
+extern double vel[];
+
+// data processing enabled
+extern uint8_t processing_enabled;
+
+// data processing
+void processing(void);
+// attitude processing
+static void attitude_processing(void);
+// velocity processing
+static void velocity_processing(void);
+
+#endif
