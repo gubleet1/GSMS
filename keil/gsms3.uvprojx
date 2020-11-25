@@ -428,7 +428,7 @@
                   <MiscControls></MiscControls>
                   <Define></Define>
                   <Undefine></Undefine>
-                  <IncludePath>.\bno055_driver;.\neom9n_driver</IncludePath>
+                  <IncludePath>.\bno055_driver;.\neom9n_driver;.\att_kf</IncludePath>
                 </VariousControls>
               </Cads>
               <Aads>
@@ -651,6 +651,21 @@
               <FileName>tm_stm32_buffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\tm_stm32\tm_stm32_buffer.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>att_kf</GroupName>
+          <Files>
+            <File>
+              <FileName>att_kf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\att_kf\att_kf.c</FilePath>
+            </File>
+            <File>
+              <FileName>rt_nonfinite.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\att_kf\rt_nonfinite.c</FilePath>
             </File>
           </Files>
         </Group>

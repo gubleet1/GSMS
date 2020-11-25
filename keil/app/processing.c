@@ -2,6 +2,7 @@
 #include "stm32f4xx_hal.h"
 #include "app_main.h"
 #include "neom9n.h"
+#include "att_kf.h"
 #include "utils.h"
 #include "processing.h"
 
@@ -16,6 +17,12 @@ double quat[QUAT_SIZE];
 
 // neo-m9n sample
 double vel[VEC_3_SIZE];
+
+// attitude kalman filter output
+double quat_kf[QUAT_SIZE];
+
+// velocity kalman filter output
+double vel_kf[VEC_3_SIZE];
 
 // data processing enabled
 uint8_t processing_enabled = 0u;
@@ -77,6 +84,19 @@ void processing(void)
 
 static void attitude_processing(void)
 {
+  // prediction step (time update)
+  att_kf_predict(gyro);
+  // measurement step (measurement update)
+  // measure gravity vector
+  double gravity_i[VEC_3_SIZE] = {0.0, 0.0, 1.0};
+  att_kf_measure(gravity_i, accel);
+  // measure north vector
+  double north_i[VEC_3_SIZE] = {0.0, 0.446, -0.895};
+  att_kf_measure(north_i, mag);
+  // propagate attitude error
+  att_kf_propagate();
+  // get attitude kalman filter output
+  att_kf_q_ref(quat_kf);
 }
 
 static void velocity_processing(void)

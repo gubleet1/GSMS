@@ -12,6 +12,12 @@ extern double quat[];
 // neo-m9n sample
 extern double vel[];
 
+// attitude kalman filter output
+extern double quat_kf[];
+
+// velocity kalman filter output
+extern double vel_kf[];
+
 // data processing enabled
 extern uint8_t processing_enabled;
 

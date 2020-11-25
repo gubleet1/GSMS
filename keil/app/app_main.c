@@ -3,6 +3,7 @@
 #include "main.h"
 #include "neom9n.h"
 #include "processing.h"
+#include "att_kf.h"
 #include "app_main.h"
 
 // hal handles
@@ -20,6 +21,8 @@ static struct bno055_t bno055;
 
 void app_init(void)
 {
+  // initialize kalman filters
+  att_kf();
   // setup bno055 and neo-m9n
   bno055_setup();
   neom9n_setup();
