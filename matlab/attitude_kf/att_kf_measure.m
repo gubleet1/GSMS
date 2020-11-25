@@ -59,7 +59,7 @@ c = v1' * v2;
 if (c > 0.99999)
     q = [1; 0; 0; 0];
 elseif (c < -0.99999)
-    w = cross(v1, [1, 1, 1]);
+    w = cross(v1, [1, 1, 1])';
     q = [0; w/norm(w)];
 else
     ax = cross(v1, v2);
