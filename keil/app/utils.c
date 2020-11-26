@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <string.h>
+#include "stm32f4xx_hal.h"
 #include "main.h"
 #include "processing.h"
 #include "utils.h"
@@ -5,15 +8,62 @@
 // hal handles
 extern UART_HandleTypeDef huart5;
 
-void transmit_bno055_raw_data(uint8_t* buf)
+// debug buffer
+uint8_t debug_curr_buf_index = 0u;
+uint8_t debug_next_buf_index = 0u;
+multi_buf_t debug_buf[BUF_DEPTH_DOUBLE];
+
+void multi_buf_init(multi_buf_t* multi_buf, uint8_t depth, uint8_t size)
 {
-  // change endianness
-  swap_LSB_MSB(buf, BNO055_BUF_SIZE);
-  // transmit raw data using uart
-  if (HAL_UART_Transmit(&huart5, buf, BNO055_BUF_SIZE, HAL_MAX_DELAY) != HAL_OK)
+  // check depth and size
+  if (depth == 0 || size == 0)
   {
     Error_Handler();
   }
+  // initialize buffers
+  for (int i = 0; i < depth; i++)
+  {
+    // allocate memory
+    multi_buf[i].data = (uint8_t*) malloc(size * sizeof(uint8_t));
+    // set empty flag
+    multi_buf[i].empty = 1u;
+  }
+}
+
+void index_inc_wrap(uint8_t* index, uint8_t size)
+{
+  // increment the index and wrap to zero if size is reached
+  *index = (*index + 1u) % size;
+}
+
+void transmit_debug(void)
+{
+  // transmit next debug buffer to host using uart
+  uint8_t *p_debug_buf = debug_buf[debug_next_buf_index].data;
+  if (HAL_UART_Transmit_DMA(&huart5, p_debug_buf, DEBUG_BUF_SIZE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  // increment next buffer index
+  index_inc_wrap(&debug_next_buf_index, BUF_DEPTH_DOUBLE);
+}
+
+void debug_tick(void)
+{
+  // get tick
+  uint32_t t = HAL_GetTick();
+  // add tick to debug buffer
+  uint8_t *p_debug_buf = debug_buf[debug_next_buf_index].data;
+  memcpy(p_debug_buf + DEBUG_BUF_OFFSET_TICK, &t, sizeof(uint32_t));
+}
+
+void debug_bno055_raw_data(uint8_t* buf)
+{
+  // add bno055 raw data to debug buffer
+  uint8_t *p_debug_buf = debug_buf[debug_next_buf_index].data;
+  memcpy(p_debug_buf + DEBUG_BUF_OFFSET_BNO055, buf, BNO055_BUF_SIZE);
+  // change endianness
+  swap_LSB_MSB(p_debug_buf + DEBUG_BUF_OFFSET_BNO055, BNO055_BUF_SIZE);
 }
 
 void update_bno055_sample(uint8_t* buf)
@@ -97,13 +147,18 @@ void update_bno055_sample(uint8_t* buf)
   quat[QUAT_Z] = (double) tmp / BNO055_QUATERNION_DIV;
 }
 
-void transmit_neom9n_raw_data(neom9n_buf_t* buf)
+void debug_neom9n_raw_data(neom9n_buf_t* buf)
 {
-  // transmit raw data using uart
-  if (HAL_UART_Transmit(&huart5, (uint8_t*) buf, sizeof(neom9n_buf_t), HAL_MAX_DELAY) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  // add neo-m9n raw data to debug buffer
+  uint8_t *p_debug_buf = debug_buf[debug_next_buf_index].data;
+  memcpy(p_debug_buf + DEBUG_BUF_OFFSET_NEOM9N, buf, NEOM9N_BUF_SIZE);
+}
+
+void debug_neom9n_padding(void)
+{
+  // add neo-m9n padding to debug buffer
+  uint8_t *p_debug_buf = debug_buf[debug_next_buf_index].data;
+  memset(p_debug_buf + DEBUG_BUF_OFFSET_NEOM9N, 0x00, NEOM9N_BUF_SIZE);
 }
 
 void update_neom9n_sample(neom9n_buf_t* buf)

@@ -1,13 +1,13 @@
-#include <stdlib.h>
 #include "stm32f4xx_hal.h"
+#include "main.h"
 #include "app_main.h"
 #include "neom9n.h"
 #include "att_kf.h"
 #include "utils.h"
 #include "processing.h"
 
-// hal handles
-extern UART_HandleTypeDef huart5;
+// debug variables
+uint8_t dt_proc;
 
 // bno055 sample
 double accel[VEC_3_SIZE];
@@ -34,6 +34,18 @@ void processing(void)
     // data processing is enabled
     if (!bno055_buf[bno055_curr_buf_index].empty)
     {
+      // record start time
+      uint32_t t0 = HAL_GetTick();
+      if (GSMS_DEBUG) {
+        // check if next debug buffer is empty
+        if (!debug_buf[debug_next_buf_index].empty)
+        {
+          Error_Handler();
+        }
+        // writing into next debug buffer, clear the empty flag
+        debug_buf[debug_next_buf_index].empty = 0u;
+      }
+
       // unread bno055 raw data is available
       // update bno055 sample
       update_bno055_sample(bno055_buf[bno055_curr_buf_index].data);
@@ -41,43 +53,26 @@ void processing(void)
       attitude_processing();
 
       if (GSMS_DEBUG) {
-        // transmit bno055 raw data to host
-        transmit_bno055_raw_data(bno055_buf[bno055_curr_buf_index].data);
+        // add bno055 raw data to debug buffer
+        debug_bno055_raw_data(bno055_buf[bno055_curr_buf_index].data);
       }
 
       // processing of current bno055 buffer is complete, set the empty flag
       bno055_buf[bno055_curr_buf_index].empty = 1u;
-      // increment current bno055 buffer index
-      bno055_buf_inc(&bno055_curr_buf_index);
+      // increment current buffer index
+      index_inc_wrap(&bno055_curr_buf_index, BUF_DEPTH_DOUBLE);
 
-      // check if unread neo-m9n raw data is available
-      if (neom9n_data_ready(NEOM9N_UPDATE_BUF))
-      {
-        // unread neo-m9n raw data is available
-        // update neo-m9n sample
-        update_neom9n_sample(&neom9n_buf);
-        // velocity processing
-        velocity_processing();
-
-        if (GSMS_DEBUG) {
-          // transmit neo-m9n raw data to host
-          transmit_neom9n_raw_data(&neom9n_buf);
-        }
-
-      } else {
-        if (GSMS_DEBUG) {
-          // transmit padding
-          uint8_t* buf = (uint8_t*) calloc(1, sizeof(neom9n_buf_t));
-          HAL_UART_Transmit(&huart5, buf, sizeof(neom9n_buf_t), HAL_MAX_DELAY);
-          free(buf);
-        }
-      }
+      // velocity processing
+      velocity_processing();
 
       if (GSMS_DEBUG) {
-        // transmit tick
-        uint32_t t = HAL_GetTick();
-        HAL_UART_Transmit(&huart5, (uint8_t*) &t, 4, HAL_MAX_DELAY);
+        // add tick to debug buffer
+        debug_tick();
+        // transmit debug buffer to host
+        transmit_debug();
       }
+      // calculate delta t
+      dt_proc = (uint8_t) (HAL_GetTick() - t0);
     }
   }
 }
@@ -101,4 +96,26 @@ static void attitude_processing(void)
 
 static void velocity_processing(void)
 {
+  // prediction step (time update)
+
+  // check if unread neo-m9n raw data is available
+  if (neom9n_data_ready(NEOM9N_UPDATE_BUF))
+  {
+    // unread neo-m9n raw data is available
+    // update neo-m9n sample
+    update_neom9n_sample(&neom9n_buf);
+
+    // measurement step (measurement update)
+
+    if (GSMS_DEBUG) {
+      // add neo-m9n raw data to debug buffer
+      debug_neom9n_raw_data(&neom9n_buf);
+    }
+  } else {
+    if (GSMS_DEBUG) {
+      // add neo-m9n padding to debug buffer
+      debug_neom9n_padding();
+    }
+  }
+  // get velocity kalman filter output
 }

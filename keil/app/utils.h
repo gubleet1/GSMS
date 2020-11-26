@@ -5,9 +5,16 @@
 #include "app_main.h"
 #include "bno055.h"
 #include "neom9n.h"
+#include "gsms_types.h"
 
 // debug defines
 #define GSMS_DEBUG 1
+
+// debug buffer defines
+#define DEBUG_BUF_SIZE 48
+#define DEBUG_BUF_OFFSET_BNO055 0
+#define DEBUG_BUF_OFFSET_NEOM9N 32
+#define DEBUG_BUF_OFFSET_TICK 44
 
 // vector defines
 // dimensions
@@ -68,13 +75,30 @@
 #define BNO055_BUF_OFFSET_QUAT_Z_LSB   (BNO055_QUATERNION_DATA_Z_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_QUAT_Z_MSB   (BNO055_QUATERNION_DATA_Z_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 
-// transmit bno055 raw data to host
-void transmit_bno055_raw_data(uint8_t*);
+// debug buffer
+extern uint8_t debug_curr_buf_index;
+extern uint8_t debug_next_buf_index;
+extern multi_buf_t debug_buf[];
+
+// multi buffer initialization
+void multi_buf_init(multi_buf_t*, uint8_t, uint8_t);
+// index increment with wraparound
+void index_inc_wrap(uint8_t*, uint8_t);
+
+// transmit debug buffer to host
+void transmit_debug(void);
+// add tick to debug buffer
+void debug_tick(void);
+
+// add bno055 raw data to debug buffer
+void debug_bno055_raw_data(uint8_t*);
 // update bno055 sample variables from raw data
 void update_bno055_sample(uint8_t*);
 
-// transmit neo-m9n raw data to host
-void transmit_neom9n_raw_data(neom9n_buf_t*);
+// add neo-m9n raw data to debug buffer
+void debug_neom9n_raw_data(neom9n_buf_t*);
+// add neo-m9n padding to debug buffer
+void debug_neom9n_padding(void);
 // update neo-m9n sample variables from raw data
 void update_neom9n_sample(neom9n_buf_t*);
 

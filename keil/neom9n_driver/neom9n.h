@@ -12,6 +12,7 @@ extern "C" {
 #define NEOM9N_BAUD_RATE 115200
 #define NEOM9N_DEFAULT_BAUD_RATE 38400
 #define NEOM9N_UPDATE_BUF 1
+#define NEOM9N_BUF_SIZE (sizeof(neom9n_buf_t))
 
 // neo-m9n constants
 #define NEOM9N_VEL_NED_DIV_MPS (1000.0)

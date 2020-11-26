@@ -1,9 +1,9 @@
-#include <stdlib.h>
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include "neom9n.h"
 #include "processing.h"
 #include "att_kf.h"
+#include "utils.h"
 #include "app_main.h"
 
 // hal handles
@@ -11,16 +11,21 @@ extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 extern I2C_HandleTypeDef hi2c1;
 
-// bno055 buffers
+// bno055 buffer
 uint8_t bno055_curr_buf_index = 0u;
 uint8_t bno055_next_buf_index = 0u;
-bno055_buf_t bno055_buf[2];
+multi_buf_t bno055_buf[BUF_DEPTH_DOUBLE];
 
 // bno055 handle
 static struct bno055_t bno055;
 
 void app_init(void)
 {
+  if (GSMS_DEBUG)
+  {
+    // initialize debug buffer
+    multi_buf_init(debug_buf, BUF_DEPTH_DOUBLE, DEBUG_BUF_SIZE);
+  }
   // initialize kalman filters
   att_kf();
   // setup bno055 and neo-m9n
@@ -36,8 +41,8 @@ void app_init(void)
 
 static void bno055_setup(void)
 {
-  // initialize buffers
-  bno055_buf_init();
+  // initialize buffer
+  multi_buf_init(bno055_buf, BUF_DEPTH_DOUBLE, BNO055_BUF_SIZE);
   // initialize handle
   bno055.bus_read = bno055_i2c_bus_read;
   bno055.bus_write = bno055_i2c_bus_write;
@@ -100,24 +105,6 @@ static void bno055_start(void)
   }
 }
 
-static void bno055_buf_init(void)
-{
-  // initialize 2 buffers
-  for (int i = 0; i < 2; i++)
-  {
-    // allocate memory
-    bno055_buf[i].data = (uint8_t*) malloc(BNO055_BUF_SIZE * sizeof(uint8_t));
-    // set empty flag
-    bno055_buf[i].empty = 1u;
-  }
-}
-
-void bno055_buf_inc(uint8_t* bno055_buf_index)
-{
-  // increment the buffer index
-  *bno055_buf_index = (*bno055_buf_index + 1u) % 2;
-}
-
 int8_t bno055_i2c_bus_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *reg_data, uint8_t cnt)
 {
   int32_t status = BNO055_SUCCESS;
@@ -171,7 +158,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
       Error_Handler();
     }
-    // check if next buffer is empty
+    // check if next bno055 buffer is empty
     if (!bno055_buf[bno055_next_buf_index].empty)
     {
       Error_Handler();
@@ -203,9 +190,21 @@ void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
   {
     // instance is I2C1
     // bno055 sample received
-    // transfer into next buffer is complete, clear the empty flag
+    // transfer into next bno055 buffer is complete, clear the empty flag
     bno055_buf[bno055_next_buf_index].empty = 0u;
     // increment next buffer index
-    bno055_buf_inc(&bno055_next_buf_index);
+    index_inc_wrap(&bno055_next_buf_index, BUF_DEPTH_DOUBLE);
+  }
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == UART5)
+  {
+    // instance is UART5
+    // transfer of current debug buffer is complete, set the empty flag
+    debug_buf[debug_curr_buf_index].empty = 1u;
+    // increment current buffer index
+    index_inc_wrap(&debug_curr_buf_index, BUF_DEPTH_DOUBLE);
   }
 }

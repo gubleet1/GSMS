@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+// debug variables
+extern uint8_t dt_proc;
+
 // bno055 sample
 extern double accel[];
 extern double mag[];
