@@ -11,10 +11,15 @@
 #define GSMS_DEBUG 1
 
 // debug buffer defines
-#define DEBUG_BUF_SIZE 48
+#define DEBUG_BUF_SIZE 62
 #define DEBUG_BUF_OFFSET_BNO055 0
-#define DEBUG_BUF_OFFSET_NEOM9N 32
-#define DEBUG_BUF_OFFSET_TICK 44
+#define DEBUG_BUF_OFFSET_NEOM9N 38
+#define DEBUG_BUF_OFFSET_QUAT_KF 50
+#define DEBUG_BUF_OFFSET_TICK 58
+#define DEBUG_BUF_QUAT_SCALE ((double) (1u << 14u))
+
+// math constants
+#define M_PI 3.14159265358979323846
 
 // vector defines
 // dimensions
@@ -75,10 +80,19 @@
 #define BNO055_BUF_OFFSET_QUAT_Z_LSB   (BNO055_QUATERNION_DATA_Z_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_QUAT_Z_MSB   (BNO055_QUATERNION_DATA_Z_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 
+// bno055 buffer linear acceleration data offset defnies
+#define BNO055_BUF_OFFSET_LIN_ACCEL_X_LSB  (BNO055_LINEAR_ACCEL_DATA_X_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
+#define BNO055_BUF_OFFSET_LIN_ACCEL_X_MSB  (BNO055_LINEAR_ACCEL_DATA_X_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
+#define BNO055_BUF_OFFSET_LIN_ACCEL_Y_LSB  (BNO055_LINEAR_ACCEL_DATA_Y_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
+#define BNO055_BUF_OFFSET_LIN_ACCEL_Y_MSB  (BNO055_LINEAR_ACCEL_DATA_Y_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
+#define BNO055_BUF_OFFSET_LIN_ACCEL_Z_LSB  (BNO055_LINEAR_ACCEL_DATA_Z_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
+#define BNO055_BUF_OFFSET_LIN_ACCEL_Z_MSB  (BNO055_LINEAR_ACCEL_DATA_Z_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
+
 // debug buffer
 extern uint8_t debug_curr_buf_index;
 extern uint8_t debug_next_buf_index;
 extern multi_buf_t debug_buf[];
+extern uint8_t debug_tx_busy;
 
 // multi buffer initialization
 void multi_buf_init(multi_buf_t*, uint8_t, uint8_t);
@@ -102,9 +116,14 @@ void debug_neom9n_padding(void);
 // update neo-m9n sample variables from raw data
 void update_neom9n_sample(neom9n_buf_t*);
 
-// combine unsigned LSB and MSB to signed int16_t
-static int16_t combine_LSB_MSB(uint8_t, uint8_t);
-// change endianness
-static void swap_LSB_MSB(uint8_t*, uint8_t);
+// add attitude kalman filter output to debug buffer
+void debug_att_kf(void);
+
+// combine two uint8_t to int16_t
+static int16_t combine_uint8_t(uint8_t, uint8_t);
+// change endianness of 16 bit types
+static void change_endian_16_t(uint8_t*, uint8_t);
+// change endianness of 32 bit types
+static void change_endian_32_t(uint8_t*, uint8_t);
 
 #endif

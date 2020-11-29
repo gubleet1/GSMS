@@ -54,6 +54,8 @@ DMA_HandleTypeDef hdma_uart5_tx;
 
 /* USER CODE BEGIN PV */
 
+uint8_t gsms_error = 0x00;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

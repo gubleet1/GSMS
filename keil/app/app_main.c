@@ -141,6 +141,8 @@ static void neom9n_start(void)
   // start tim4 at 625Hz
   // Note: This rate is used to continuously read neo-m9n data from the UART
   //       buffer. The actual sample output rate of the neo-m9n is set to 25Hz.
+  // Note: The TIM4 interrupt is also used to start transmitting the current
+  //       debug buffer over UART using DMA.
   if(HAL_TIM_Base_Start_IT(&htim4) != HAL_OK)
   {
     Error_Handler();
@@ -156,11 +158,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     // check if i2c is ready
     if (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
     {
+      gsms_error += 0x01;
       Error_Handler();
     }
     // check if next bno055 buffer is empty
     if (!bno055_buf[bno055_next_buf_index].empty)
     {
+      gsms_error += 0x02;
       Error_Handler();
     }
     // i2c read parameters
@@ -177,6 +181,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   else if (htim->Instance == TIM4)
   {
     // instance is TIM4
+    // check if UART transmission of debug buffer is not ongoing
+    if (!debug_tx_busy)
+    {
+      // check if current debug buffer is not empty
+      if (!debug_buf[debug_curr_buf_index].empty)
+      {
+        // start transmission of current debug buffer
+        transmit_debug();
+        // set the debug tx busy flag
+        debug_tx_busy = 0x01;
+      }
+    }
     // check for new neo-m9n data in UART buffer at 625Hz
     // Note: This will process received characters and update internal neo-m9n
     //       state variables if a full packet has been received.
@@ -206,5 +222,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
     debug_buf[debug_curr_buf_index].empty = 1u;
     // increment current buffer index
     index_inc_wrap(&debug_curr_buf_index, BUF_DEPTH_DOUBLE);
+    // clear the debug tx busy flag
+    debug_tx_busy = 0x00;
   }
 }

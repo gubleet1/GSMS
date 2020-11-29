@@ -8,12 +8,14 @@
 
 // debug variables
 uint8_t dt_proc;
+double att_error;
 
 // bno055 sample
 double accel[VEC_3_SIZE];
 double mag[VEC_3_SIZE];
 double gyro[VEC_3_SIZE];
 double quat[QUAT_SIZE];
+double lin_accel[VEC_3_SIZE];
 
 // neo-m9n sample
 double vel[VEC_3_SIZE];
@@ -34,16 +36,17 @@ void processing(void)
     // data processing is enabled
     if (!bno055_buf[bno055_curr_buf_index].empty)
     {
-      // record start time
-      uint32_t t0 = HAL_GetTick();
+      // start time
+      uint32_t t0;
       if (GSMS_DEBUG) {
+        // record start time
+        t0 = HAL_GetTick();
         // check if next debug buffer is empty
         if (!debug_buf[debug_next_buf_index].empty)
         {
+          gsms_error += 0x20;
           Error_Handler();
         }
-        // writing into next debug buffer, clear the empty flag
-        debug_buf[debug_next_buf_index].empty = 0u;
       }
 
       // unread bno055 raw data is available
@@ -66,13 +69,21 @@ void processing(void)
       velocity_processing();
 
       if (GSMS_DEBUG) {
+        // add attitude kalman filter output to debug buffer
+        debug_att_kf();
         // add tick to debug buffer
         debug_tick();
-        // transmit debug buffer to host
-        transmit_debug();
+
+        // writing into next debug buffer is complete, clear the empty flag
+        debug_buf[debug_next_buf_index].empty = 0u;
+        // increment next buffer index
+        index_inc_wrap(&debug_next_buf_index, BUF_DEPTH_DOUBLE);
+
+        // calculate attitude error
+        att_error = angle_between_quat(quat_kf, quat) / M_PI * 180.0;
+        // calculate delta t
+        dt_proc = (uint8_t) (HAL_GetTick() - t0);
       }
-      // calculate delta t
-      dt_proc = (uint8_t) (HAL_GetTick() - t0);
     }
   }
 }

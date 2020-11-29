@@ -5,12 +5,14 @@
 
 // debug variables
 extern uint8_t dt_proc;
+extern double att_error;
 
 // bno055 sample
 extern double accel[];
 extern double mag[];
 extern double gyro[];
 extern double quat[];
+extern double lin_accel[];
 
 // neo-m9n sample
 extern double vel[];

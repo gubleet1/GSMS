@@ -54,6 +54,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+extern uint8_t gsms_error;
 
 /* USER CODE END EFP */
 
