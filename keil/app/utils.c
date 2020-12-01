@@ -13,6 +13,10 @@ uint8_t debug_curr_buf_index = 0u;
 uint8_t debug_next_buf_index = 0u;
 multi_buf_t debug_buf[BUF_DEPTH_DOUBLE];
 uint8_t debug_tx_busy = 0u;
+static uint32_t debug_buf_neom9n_padding[VEC_3_SIZE]
+  = {DEBUG_BUF_NEOM9N_PADDING_VAL,
+     DEBUG_BUF_NEOM9N_PADDING_VAL,
+     DEBUG_BUF_NEOM9N_PADDING_VAL};
 
 void multi_buf_init(multi_buf_t* multi_buf, uint8_t depth, uint8_t size)
 {
@@ -177,7 +181,7 @@ void debug_neom9n_padding(void)
 {
   // add neo-m9n padding to debug buffer
   uint8_t *p_debug_buf = debug_buf[debug_next_buf_index].data;
-  memset(p_debug_buf + DEBUG_BUF_OFFSET_NEOM9N, 0x00, NEOM9N_BUF_SIZE);
+  memcpy(p_debug_buf + DEBUG_BUF_OFFSET_NEOM9N, debug_buf_neom9n_padding, NEOM9N_BUF_SIZE);
 }
 
 void update_neom9n_sample(neom9n_buf_t* buf)
@@ -203,6 +207,36 @@ void debug_att_kf(void)
   }
   // change endianness
   change_endian_16_t(p_debug_buf + DEBUG_BUF_OFFSET_QUAT_KF, 8u);
+}
+
+void vec_copy(double* vdst, double* vsrc, uint8_t size)
+{
+  // size check
+  if (size == 0)
+  {
+    // invalid size
+    Error_Handler();
+  }
+  // copy vector
+  for (int i = 0; i < size; i++)
+  {
+    vdst[i] = vsrc[i];
+  }
+}
+
+void vec_sub(double* va, double* vb, double* vres, uint8_t size)
+{
+  // size check
+  if (size == 0)
+  {
+    // invalid size
+    Error_Handler();
+  }
+  // subtract vectors
+  for (int i = 0; i < size; i++)
+  {
+    vres[i] = va[i] - vb[i];
+  }
 }
 
 static int16_t combine_uint8_t(uint8_t lsb, uint8_t msb)

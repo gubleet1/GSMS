@@ -183,15 +183,20 @@
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>gsms_error</ItemText>
+          <ItemText>velocity_kf</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>dt_proc</ItemText>
+          <ItemText>gsms_error</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>dt_proc</ItemText>
+        </Ww>
+        <Ww>
+          <count>9</count>
           <WinNumber>1</WinNumber>
           <ItemText>att_error</ItemText>
         </Ww>
@@ -459,6 +464,26 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\att_kf\rt_nonfinite.c</PathWithFileName>
       <FilenameWithoutPath>rt_nonfinite.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>vel_kf</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>15</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\vel_kf\vel_kf.c</PathWithFileName>
+      <FilenameWithoutPath>vel_kf.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

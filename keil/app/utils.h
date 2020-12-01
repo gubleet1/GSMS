@@ -16,6 +16,7 @@
 #define DEBUG_BUF_OFFSET_NEOM9N 38
 #define DEBUG_BUF_OFFSET_QUAT_KF 50
 #define DEBUG_BUF_OFFSET_TICK 58
+#define DEBUG_BUF_NEOM9N_PADDING_VAL 0x00000080
 #define DEBUG_BUF_QUAT_SCALE ((double) (1u << 14u))
 
 // math constants
@@ -118,6 +119,11 @@ void update_neom9n_sample(neom9n_buf_t*);
 
 // add attitude kalman filter output to debug buffer
 void debug_att_kf(void);
+
+// copy vector
+void vec_copy(double*, double*, uint8_t);
+// subtract vectors
+void vec_sub(double*, double*, double*, uint8_t);
 
 // combine two uint8_t to int16_t
 static int16_t combine_uint8_t(uint8_t, uint8_t);

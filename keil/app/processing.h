@@ -21,7 +21,7 @@ extern double vel[];
 extern double quat_kf[];
 
 // velocity kalman filter output
-extern double vel_kf[];
+extern double velocity_kf[];
 
 // data processing enabled
 extern uint8_t processing_enabled;

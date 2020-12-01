@@ -428,7 +428,7 @@
                   <MiscControls></MiscControls>
                   <Define></Define>
                   <Undefine></Undefine>
-                  <IncludePath>.\bno055_driver;.\neom9n_driver;.\att_kf</IncludePath>
+                  <IncludePath>.\bno055_driver;.\neom9n_driver;.\att_kf;.\vel_kf</IncludePath>
                 </VariousControls>
               </Cads>
               <Aads>
@@ -666,6 +666,16 @@
               <FileName>rt_nonfinite.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\att_kf\rt_nonfinite.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>vel_kf</GroupName>
+          <Files>
+            <File>
+              <FileName>vel_kf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\vel_kf\vel_kf.c</FilePath>
             </File>
           </Files>
         </Group>

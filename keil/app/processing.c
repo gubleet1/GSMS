@@ -3,6 +3,7 @@
 #include "app_main.h"
 #include "neom9n.h"
 #include "att_kf.h"
+#include "vel_kf.h"
 #include "utils.h"
 #include "processing.h"
 
@@ -24,7 +25,7 @@ double vel[VEC_3_SIZE];
 double quat_kf[QUAT_SIZE];
 
 // velocity kalman filter output
-double vel_kf[VEC_3_SIZE];
+double velocity_kf[VEC_3_SIZE];
 
 // data processing enabled
 uint8_t processing_enabled = 0u;
@@ -95,10 +96,14 @@ static void attitude_processing(void)
   // measurement step (measurement update)
   // measure gravity vector
   double gravity_i[VEC_3_SIZE] = {0.0, 0.0, 1.0};
-  att_kf_measure(gravity_i, accel);
+  double accel_in[VEC_3_SIZE];
+  vec_copy(accel_in, accel, VEC_3_SIZE);
+  att_kf_measure(gravity_i, accel_in);
   // measure north vector
   double north_i[VEC_3_SIZE] = {0.0, 0.446, -0.895};
-  att_kf_measure(north_i, mag);
+  double mag_in[VEC_3_SIZE];
+  vec_copy(mag_in, mag, VEC_3_SIZE);
+  att_kf_measure(north_i, mag_in);
   // propagate attitude error
   att_kf_propagate();
   // get attitude kalman filter output
@@ -107,7 +112,19 @@ static void attitude_processing(void)
 
 static void velocity_processing(void)
 {
+  // calculate linear acceleration
+  double quat_kf_conj[QUAT_SIZE];
+  quat_conj(quat_kf, quat_kf_conj);
+  double gravity_i[VEC_3_SIZE] = {0.0, 0.0, 9.8053};
+  double gravity_b[VEC_3_SIZE];
+  // rotate gravity vector from the inertial frame into the body frame
+  rotate_by_quat(gravity_i, quat_kf_conj, gravity_b);
+  // subtract gravity vector from acceleration vector
+  double lin_accel_kf[VEC_3_SIZE];
+  vec_sub(accel, gravity_b, lin_accel_kf, VEC_3_SIZE);
+
   // prediction step (time update)
+  vel_kf_predict(lin_accel_kf);
 
   // check if unread neo-m9n raw data is available
   if (neom9n_data_ready(NEOM9N_UPDATE_BUF))
@@ -116,7 +133,22 @@ static void velocity_processing(void)
     // update neo-m9n sample
     update_neom9n_sample(&neom9n_buf);
 
+    // change velocity reference frame from NED to ENU
+    double vel_ENU[VEC_3_SIZE];
+    vel_ENU[VEC_ENU_E] = vel[VEC_NED_E];
+    vel_ENU[VEC_ENU_N] = vel[VEC_NED_N];
+    vel_ENU[VEC_ENU_U] = -vel[VEC_NED_D];
+    // correct declination
+    double ang = 2.9425 / 180.0 * M_PI;
+    double measured_i[VEC_3_SIZE];
+    rotate_z_by_ang(vel_ENU, ang, measured_i);
+    // rotate measurement from the inertial frame into the body frame
+    double measured_b[VEC_3_SIZE];
+    rotate_by_quat(measured_i, quat_kf_conj, measured_b);
+
     // measurement step (measurement update)
+    // measure velocity vector
+    vel_kf_measure(measured_b);
 
     if (GSMS_DEBUG) {
       // add neo-m9n raw data to debug buffer
@@ -129,4 +161,5 @@ static void velocity_processing(void)
     }
   }
   // get velocity kalman filter output
+  vel_kf_vel(velocity_kf);
 }

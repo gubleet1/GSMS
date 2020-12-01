@@ -3,6 +3,7 @@
 #include "neom9n.h"
 #include "processing.h"
 #include "att_kf.h"
+#include "vel_kf.h"
 #include "utils.h"
 #include "app_main.h"
 
@@ -28,6 +29,7 @@ void app_init(void)
   }
   // initialize kalman filters
   att_kf();
+  vel_kf();
   // setup bno055 and neo-m9n
   bno055_setup();
   neom9n_setup();
