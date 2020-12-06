@@ -1,4 +1,5 @@
 #include "stm32f4xx_hal.h"
+#include "Board_LED.h"
 #include "main.h"
 #include "app_main.h"
 #include "neom9n.h"
@@ -17,6 +18,7 @@ double mag[VEC_3_SIZE];
 double gyro[VEC_3_SIZE];
 double quat[QUAT_SIZE];
 double lin_accel[VEC_3_SIZE];
+uint8_t calib_ok;
 
 // neo-m9n sample
 double vel[VEC_3_SIZE];
@@ -53,6 +55,9 @@ void processing(void)
       // unread bno055 raw data is available
       // update bno055 sample
       update_bno055_sample(bno055_buf[bno055_curr_buf_index].data);
+      // display bno055 calibration status
+      display_calib_stat();
+
       // attitude processing
       attitude_processing();
 
@@ -162,4 +167,19 @@ static void velocity_processing(void)
   }
   // get velocity kalman filter output
   vel_kf_vel(velocity_kf);
+}
+
+static void display_calib_stat(void)
+{
+  // display the calibration status using the green LED
+  if (calib_ok)
+  {
+    // turn on the green LED
+    LED_On(0u);
+  }
+  else
+  {
+    // turn off the green LED
+    LED_Off(0u);
+  }
 }

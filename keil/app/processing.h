@@ -13,6 +13,7 @@ extern double mag[];
 extern double gyro[];
 extern double quat[];
 extern double lin_accel[];
+extern uint8_t calib_ok;
 
 // neo-m9n sample
 extern double vel[];
@@ -32,5 +33,8 @@ void processing(void);
 static void attitude_processing(void);
 // velocity processing
 static void velocity_processing(void);
+
+// display bno055 calibration status
+static void display_calib_stat(void);
 
 #endif

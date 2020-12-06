@@ -89,6 +89,9 @@
 #define BNO055_BUF_OFFSET_LIN_ACCEL_Z_LSB  (BNO055_LINEAR_ACCEL_DATA_Z_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_LIN_ACCEL_Z_MSB  (BNO055_LINEAR_ACCEL_DATA_Z_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 
+// bno055 buffer status register offset defnies
+#define BNO055_BUF_OFFSET_CALIB_STAT  (BNO055_CALIB_STAT_ADDR - BNO055_BUF_BASE_REG_ADDR)
+
 // debug buffer
 extern uint8_t debug_curr_buf_index;
 extern uint8_t debug_next_buf_index;

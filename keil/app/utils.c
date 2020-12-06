@@ -65,9 +65,9 @@ void debug_bno055_raw_data(uint8_t* buf)
 {
   // add bno055 raw data to debug buffer
   uint8_t *p_debug_buf = debug_buf[debug_next_buf_index].data;
-  memcpy(p_debug_buf + DEBUG_BUF_OFFSET_BNO055, buf, BNO055_BUF_SIZE);
+  memcpy(p_debug_buf + DEBUG_BUF_OFFSET_BNO055, buf, 38u);
   // change endianness
-  change_endian_16_t(p_debug_buf + DEBUG_BUF_OFFSET_BNO055, BNO055_BUF_SIZE);
+  change_endian_16_t(p_debug_buf + DEBUG_BUF_OFFSET_BNO055, 38u);
 }
 
 void update_bno055_sample(uint8_t* buf)
@@ -166,6 +166,10 @@ void update_bno055_sample(uint8_t* buf)
   tmp_msb = buf[BNO055_BUF_OFFSET_LIN_ACCEL_Z_MSB];
   tmp = combine_uint8_t(tmp_lsb, tmp_msb);
   lin_accel[VEC_3_Z] = (double) tmp / BNO055_ACCEL_DIV_MSQ;
+
+  // update bno055 calibration status
+  uint8_t calib_stat = buf[BNO055_BUF_OFFSET_CALIB_STAT];
+  calib_ok = ((calib_stat == 0xFF) ? 0x01 : 0x00);
 }
 
 void debug_neom9n_raw_data(neom9n_buf_t* buf)
