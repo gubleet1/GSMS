@@ -22,7 +22,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Board_LED.h"
 #include "app_main.h"
 #include "processing.h"
 
@@ -111,7 +110,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // initialize LEDs
-  LED_Initialize();
+  LED_init();
 
   // initialize app
   app_init();
@@ -409,7 +408,7 @@ void Error_Handler(void)
   /* User can add his own implementation to report the HAL error return state */
 
   // turn on red LED
-  LED_On(1u);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
   // loop forever
   while(1);
 

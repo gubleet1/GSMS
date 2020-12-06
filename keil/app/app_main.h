@@ -17,6 +17,9 @@ extern multi_buf_t bno055_buf[];
 // app initialization
 void app_init(void);
 
+// LED initialization
+void LED_init(void);
+
 // bno055 setup
 static void bno055_setup(void);
 // bno055 start

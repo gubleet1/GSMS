@@ -680,9 +680,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>::Board Support</GroupName>
-        </Group>
-        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
@@ -701,12 +698,6 @@
       </gpdsc>
     </gpdscs>
     <apis>
-      <api Capiversion="1.0.0" Cclass="Board Support" Cgroup="LED" exclusive="0">
-        <package license="license.rtf" name="MDK-Middleware" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="7.12.0"/>
-        <targetInfos>
-          <targetInfo name="Target 1"/>
-        </targetInfos>
-      </api>
       <api Capiversion="1.0.0" Cclass="Device" Cgroup="STM32Cube Framework" exclusive="1">
         <package name="STM32F4xx_DFP" schemaVersion="1.6.3" url="http://www.keil.com/pack/" vendor="Keil" version="2.15.0"/>
         <targetInfos>
@@ -717,12 +708,6 @@
     <components>
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.4.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.7.0"/>
-        <targetInfos>
-          <targetInfo name="Target 1"/>
-        </targetInfos>
-      </component>
-      <component Capiversion="1.0.0" Cbundle="STM32F429I-Discovery" Cclass="Board Support" Cgroup="LED" Cvendor="Keil" Cversion="1.0.0" condition="STM32F4 HAL GPIO">
-        <package name="STM32F4xx_DFP" schemaVersion="1.6.3" url="http://www.keil.com/pack/" vendor="Keil" version="2.15.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>

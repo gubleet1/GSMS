@@ -41,6 +41,21 @@ void app_init(void)
   processing_enabled = 1u;
 }
 
+void LED_init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct;
+
+  /* GPIO Ports Clock Enable */
+  __GPIOB_CLK_ENABLE();
+
+  /* Configure GPIO pins: PB0 PB14 */
+  GPIO_InitStruct.Pin   = GPIO_PIN_0 | GPIO_PIN_14;
+  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
+
 static void bno055_setup(void)
 {
   // initialize buffer

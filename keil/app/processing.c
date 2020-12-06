@@ -1,5 +1,4 @@
 #include "stm32f4xx_hal.h"
-#include "Board_LED.h"
 #include "main.h"
 #include "app_main.h"
 #include "neom9n.h"
@@ -177,11 +176,11 @@ static void display_calib_stat(void)
   if (calib_ok)
   {
     // turn on the green LED
-    LED_On(0u);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
   }
   else
   {
     // turn off the green LED
-    LED_Off(0u);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
   }
 }
