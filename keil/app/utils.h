@@ -11,13 +11,15 @@
 #define GSMS_DEBUG 1
 
 // debug buffer defines
-#define DEBUG_BUF_SIZE 62
+#define DEBUG_BUF_SIZE 68
 #define DEBUG_BUF_OFFSET_BNO055 0
 #define DEBUG_BUF_OFFSET_NEOM9N 38
 #define DEBUG_BUF_OFFSET_QUAT_KF 50
 #define DEBUG_BUF_OFFSET_TICK 58
+#define DEBUG_BUF_OFFSET_VEL_KF 62
 #define DEBUG_BUF_NEOM9N_PADDING_VAL 0x00000080
 #define DEBUG_BUF_QUAT_SCALE ((double) (1u << 14u))
+#define DEBUG_BUF_VEL_SCALE 1000.0
 
 // math constants
 #define M_PI 3.14159265358979323846
@@ -47,7 +49,7 @@
 #define QUAT_Y 2
 #define QUAT_Z 3
 
-// bno055 buffer accelerometer data offset defnies
+// bno055 buffer accelerometer data offset defines
 #define BNO055_BUF_OFFSET_ACCEL_X_LSB  (BNO055_ACCEL_DATA_X_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_ACCEL_X_MSB  (BNO055_ACCEL_DATA_X_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_ACCEL_Y_LSB  (BNO055_ACCEL_DATA_Y_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
@@ -55,7 +57,7 @@
 #define BNO055_BUF_OFFSET_ACCEL_Z_LSB  (BNO055_ACCEL_DATA_Z_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_ACCEL_Z_MSB  (BNO055_ACCEL_DATA_Z_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 
-// bno055 buffer magnetometer data offset defnies
+// bno055 buffer magnetometer data offset defines
 #define BNO055_BUF_OFFSET_MAG_X_LSB    (BNO055_MAG_DATA_X_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_MAG_X_MSB    (BNO055_MAG_DATA_X_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_MAG_Y_LSB    (BNO055_MAG_DATA_Y_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
@@ -63,7 +65,7 @@
 #define BNO055_BUF_OFFSET_MAG_Z_LSB    (BNO055_MAG_DATA_Z_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_MAG_Z_MSB    (BNO055_MAG_DATA_Z_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 
-// bno055 buffer gyroscope data offset defnies
+// bno055 buffer gyroscope data offset defines
 #define BNO055_BUF_OFFSET_GYRO_X_LSB   (BNO055_GYRO_DATA_X_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_GYRO_X_MSB   (BNO055_GYRO_DATA_X_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_GYRO_Y_LSB   (BNO055_GYRO_DATA_Y_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
@@ -81,7 +83,7 @@
 #define BNO055_BUF_OFFSET_QUAT_Z_LSB   (BNO055_QUATERNION_DATA_Z_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_QUAT_Z_MSB   (BNO055_QUATERNION_DATA_Z_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 
-// bno055 buffer linear acceleration data offset defnies
+// bno055 buffer linear acceleration data offset defines
 #define BNO055_BUF_OFFSET_LIN_ACCEL_X_LSB  (BNO055_LINEAR_ACCEL_DATA_X_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_LIN_ACCEL_X_MSB  (BNO055_LINEAR_ACCEL_DATA_X_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_LIN_ACCEL_Y_LSB  (BNO055_LINEAR_ACCEL_DATA_Y_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
@@ -89,7 +91,7 @@
 #define BNO055_BUF_OFFSET_LIN_ACCEL_Z_LSB  (BNO055_LINEAR_ACCEL_DATA_Z_LSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 #define BNO055_BUF_OFFSET_LIN_ACCEL_Z_MSB  (BNO055_LINEAR_ACCEL_DATA_Z_MSB_ADDR - BNO055_BUF_BASE_REG_ADDR)
 
-// bno055 buffer status register offset defnies
+// bno055 buffer status register offset defines
 #define BNO055_BUF_OFFSET_CALIB_STAT  (BNO055_CALIB_STAT_ADDR - BNO055_BUF_BASE_REG_ADDR)
 
 // debug buffer
@@ -122,6 +124,9 @@ void update_neom9n_sample(neom9n_buf_t*);
 
 // add attitude kalman filter output to debug buffer
 void debug_att_kf(void);
+
+// add velocity kalman filter output to debug buffer
+void debug_vel_kf(void);
 
 // copy vector
 void vec_copy(double*, double*, uint8_t);

@@ -213,6 +213,20 @@ void debug_att_kf(void)
   change_endian_16_t(p_debug_buf + DEBUG_BUF_OFFSET_QUAT_KF, 8u);
 }
 
+void debug_vel_kf(void)
+{
+  // add velocity kalman filter output to debug buffer
+  uint8_t *p_debug_buf = debug_buf[debug_next_buf_index].data;
+  int16_t tmp;
+  for (int i = 0; i < VEC_3_SIZE; i++)
+  {
+    tmp = (int16_t) (velocity_kf[i] * DEBUG_BUF_VEL_SCALE);
+    memcpy(p_debug_buf + DEBUG_BUF_OFFSET_VEL_KF + (i * 2), &tmp, 2u);
+  }
+  // change endianness
+  change_endian_16_t(p_debug_buf + DEBUG_BUF_OFFSET_VEL_KF, 6u);
+}
+
 void vec_copy(double* vdst, double* vsrc, uint8_t size)
 {
   // size check

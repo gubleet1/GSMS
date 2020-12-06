@@ -77,6 +77,8 @@ void processing(void)
       if (GSMS_DEBUG) {
         // add attitude kalman filter output to debug buffer
         debug_att_kf();
+        // add velocity kalman filter output to debug buffer
+        debug_vel_kf();
         // add tick to debug buffer
         debug_tick();
 

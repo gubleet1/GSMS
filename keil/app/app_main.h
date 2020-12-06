@@ -5,7 +5,7 @@
 #include "bno055.h"
 #include "gsms_types.h"
 
-// bno055 buffer defnies
+// bno055 buffer defines
 #define BNO055_BUF_SIZE                (46u)
 #define BNO055_BUF_BASE_REG_ADDR       (BNO055_ACCEL_DATA_X_LSB_ADDR)
 
