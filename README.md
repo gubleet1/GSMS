@@ -6,7 +6,7 @@
 
 ## Description
 
-Ground speed measuring system (GSMS) for electric race car.
+Ground speed measuring system (GSMS) for electric race car based on **sensor fusion** using an **IMU** (Accelerometer, Gyroscope and Magnetometer) and a **GPS**. The sensor data is fused using a cascade of two **Kalman filters**. Implemented on an STM32F4 using bare metal programming in **C/C++**. The data processing code and filters were first implemented and tested in **MATLAB**.
 
 ## Project Structure
 
